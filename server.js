@@ -47,7 +47,7 @@ app.post('/api/linesend', (req, res) => {
             res.status(500).send('Internal Server Error');
           }
         } finally {
-          connection.end(); // Close the MySQL connection
+          // connection.end(); // Close the MySQL connection
         }
       } else {
         res.status(400).json({ "status": "fail auth", "message": 'RoomID and Password Invalid.' });
