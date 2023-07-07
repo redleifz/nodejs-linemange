@@ -17,7 +17,8 @@ const dbConfig = {
     database: process.env.DB_NAME
 }
 
-const connection = mysql.createConnection(dbConfig);
+
+  
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
@@ -25,6 +26,8 @@ app.listen(process.env.PORT, () => {
 
 
 app.post('/api/linesend', (req, res) => {
+    const connection = mysql.createConnection(dbConfig);
+
     const roomId = req.body.roomId;
     const roomPassword = req.body.roomPassword;
     const roomContent = req.body.roomContent;
@@ -40,19 +43,27 @@ app.post('/api/linesend', (req, res) => {
         try {
           await sendLineNotification(roomContent, lineToken);
           res.status(200).json({ "status": "Success", "content": roomContent });
+  
         } catch (error) {
           if (error.response && error.response.data) {
             res.status(400).send(`Error sending Line notification: ${error.response.data.message}`);
+
           } else {
             res.status(500).send('Internal Server Error');
           }
         } finally {
-          // connection.end(); // Close the MySQL connection
+          connection.end(); // Close the MySQL connection
+          // console.log("Connection closed");
         }
       } else {
         res.status(400).json({ "status": "fail auth", "message": 'RoomID and Password Invalid.' });
+        connection.end(); // Close the MySQL connection
+        // console.log("Connection closed");
       }
     });
+
+ 
+
   });
   
   async function sendLineNotification(roomContent, lineToken) {
